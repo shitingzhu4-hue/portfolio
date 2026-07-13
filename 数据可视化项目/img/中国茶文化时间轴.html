@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>中国茶文化时间轴（1911年前）</title>
+    <style>
+        :root {
+            --tea-green: #6B8E23;
+            --parchment: #F5E6D3;
+            --nav-color: rgba(124, 156, 144, 0.95);
+        }
+
+                /* 新增导航系统样式 */
+                .side-nav {
+            position: fixed;
+            left: -120px;
+            width: 120px;
+            height: 100vh;
+            background: var(--nav-color);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 60px;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+        }
+
+        .side-nav-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 40px;
+            background: #f8f3e9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: #3a8c7d;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .side-nav-item {
+            width: 80%;
+            margin: 15px 0;
+            padding: 12px 0;
+            color: #f8f3e9;
+            text-align: center;
+            border-top: 1px solid rgba(248,243,233,0.3);
+            border-bottom: 1px solid rgba(248,243,233,0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .side-nav-show {
+            position: fixed;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 50px;
+            background: rgba(124, 156, 144, 0.7);
+            cursor: pointer;
+            z-index: 999;
+            border-radius: 0 5px 5px 0;
+        }
+
+        /* 多媒体控制系统 */
+        .top-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .control-button {
+            width: 40px;
+            height: 40px;
+            background: rgba(124, 156, 144, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .next-page-arrow {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(124, 156, 144, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        /* 新增：页面内容容器 */
+        .main-content {
+            margin-left: 0;
+            transition: all 0.3s;
+        }
+
+        body {
+            margin: 0;
+            overflow-x: hidden;
+            background: url(image/background2.jpg) center/cover no-repeat fixed;
+            /* linear-gradient(45deg, #f5f5dc, #f0e68c); */
+            font-family: 'SimSun', serif;
+        }
+
+        .timeline-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 5% 0;
+            /* padding-top: 80px; */
+        }
+
+        .timeline {
+            display: flex;
+            position: relative;
+            padding: 0 10vw;
+            overflow-x: auto; /* 启用横向滚动 */
+            scroll-behavior: smooth; /* 平滑滚动 */
+            scroll-snap-type: x mandatory; /* 滚动对齐 */
+            transition: padding 0.5s; /* 添加过渡效果 */
+        }
+
+        .line {
+            position: absolute;
+            height: 4px;
+            background: var(--tea-green);
+            top: 50%;
+            left: 0;
+            right: 0;
+            transform: translateY(-50%);
+        }
+
+        .era {
+            position: relative;
+            min-width: 300px;
+            padding: 20px;
+            margin: 0 50px;
+            background: var(--parchment);
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: 0.3s;
+        }
+
+        .era:hover {
+            transform: translateY(-20px);
+        }
+
+        .era::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--tea-green);
+            border-radius: 50%;
+            top: 50%;
+            left: -40px;
+            transform: translateY(-50%);
+        }
+
+        .era h2 {
+            color: var(--tea-green);
+            border-bottom: 2px solid;
+            padding-bottom: 10px;
+        }
+
+        .era-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s;
+        }
+
+        /* .era:hover .era-content {
+            max-height: 500px;
+        } */
+
+        .decoration {
+            position: absolute;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .tea-leaf {
+            width: 100%;
+            /* height: 100px; */
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%236B8E23" d="M50,10 C70,30 90,40 90,60 C80,80 60,90 50,90 C40,90 20,80 10,60 C10,40 30,30 50,10 Z"/></svg>') no-repeat;
+        }
+
+        /* 按钮样式 */
+        .button-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: var(--parchment);
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        #prevBtn, #nextBtn {
+            padding: 8px 16px;
+            border: 2px solid var(--tea-green);
+            background: white;
+            color: var(--tea-green);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'SimSun', serif;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        #prevBtn:hover, #nextBtn:hover {
+            background-color: var(--tea-green);
+            color: white;
+        }
+
+        #prevBtn:disabled, #nextBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .era {
+            scroll-snap-align: center; /* 滚动时自动居中对齐 */
+        }
+
+        /* 隐藏滚动条（可选） */
+        .timeline::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* 响应式设计 */
+        /* @media (max-width: 768px) {
+            .timeline {
+                flex-direction: column;
+                padding: 20% 10vw;
+            }
+
+            .era {
+                margin: 20px 0;
+                width: 80vw;
+            }
+
+            .line {
+                display: none;
+            }
+        } */
+
+        /* 修改后的信息栏样式 */
+        .info-panel {
+            position: fixed;
+            right: -300px;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: rgba(249, 245, 237, 0.95);
+            box-shadow: -2px 0 15px rgba(0,0,0,0.1);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 999;
+        }
+
+        .info-panel.active {
+            right: 0;
+        }
+
+        .toggle-btn {
+            position: absolute;
+            left: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 100px;
+            background: #3D6250 url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>') center/50% no-repeat;
+            cursor: pointer;
+            border-radius: 8px 0 0 8px;
+            transition: all 0.3s;
+        }
+
+        /* 当信息栏展开时调整页面布局 */
+        body.info-panel-active .main-content {
+            margin-right: 300px;
+        }
+
+        body.info-panel-active .timeline {
+            padding-right: calc(10vw + 300px);
+        }
+
+        @media (max-width: 768px) {
+            .info-panel {
+                width: 80%;
+                right: -80%;
+            }
+            
+            body.info-panel-active .main-content {
+                margin-right: 80%;
+            }
+            
+            .toggle-btn {
+                left: -30px;
+                width: 30px;
+                height: 80px;
+            }
+        }    
+    </style>
+</head>
+<body>
+
+    <!-- 新增导航系统 -->
+    <nav class="side-nav">
+        <div class="side-nav-logo">茶</div>
+        <a href="视频.html" class="side-nav-item">首页</a>
+        <a href="中国茶典籍数据可视化.html" class="side-nav-item">典籍</a>
+        <a href="中国茶文化时间轴.html" class="side-nav-item">茶史</a>
+        <a href="茶冲泡（有背景）.html" class="side-nav-item">茶艺</a>
+        <a href="russia_trade.html" class="side-nav-item">茶贸</a>
+    </nav>
+
+    <div class="side-nav-show"></div>
+    <div class="next-page-arrow" id="nextPageBtn">›</div>
+
+    <!-- 多媒体控制 -->
+    <div class="top-controls">
+        <div class="control-button" id="musicControl">🎵</div>
+        <div class="control-button" id="helpButton">?</div>
+        <div class="control-button" id="backButton">←</div>
+    </div>
+
+
+    <!-- 新增main-content包裹层 -->
+    <div class="main-content">
+
+        <!-- 导航按钮 -->
+        <div class="button-container">
+            <button id="prevBtn">&larr; 上一个时期</button>
+            <button id="nextBtn">下一个时期 &rarr;</button>
+        </div>
+
+        <div class="timeline-container">
+            <div class="timeline">
+                <div class="line"></div>
+                
+                <!-- 神农尝百草 -->
+                <div class="era">
+                    <h2>神农尝百草</h2>
+                    <div class="era-content">
+                        <p>神农氏是中国古代神话传说中的人物，他为了掌握草药的特性，亲自实践，遍尝百草，偶然得到了荼（茶叶）解毒。神农氏作为茶的发现者，虽然其真实性未有考古证据证实，但其故事体现了茶在古代就被人们所重视。</p>
+                        <img class="tea-leaf" alt="茶叶" src="image/神农氏.jpg">
+                    </div>
+                </div>
+
+                <!-- 东汉末年华佗与茶 -->
+                <div class="era">
+                    <h2>东汉末年华佗与茶</h2>
+                    <div class="era-content">
+                        <p>东汉末年的名医华佗在《食论》中提到："苦茶久食，益意思。"这是历史上第一次关于茶具有用药价值的记载。</p>
+                        <img class="tea-leaf" alt="茶叶" src="image/华佗.jpg">
+                    </div>
+                </div>
+
+                <!-- 三国时期孙皓赐茶代酒 -->
+                <div class="era">
+                    <h2>三国时期孙皓赐茶代酒</h2>
+                    <div class="era-content">
+                        <p>三国时期的吴国孙皓帝君嗜酒如命，但对博学的韦曜特别宽容，常以茶代替酒。这是以茶代酒的最早记载，显示了茶在宫廷中的地位。</p>
+                        <img class="tea-leaf" alt="茶叶" src="image/孙皓.jpg">
+                    </div>
+                </div>
+
+                <!-- 三国时期魏国茶故事 不科学-->
+                <!-- <div class="era">
+                    <h2>三国时期魏国（220年—280年）</h2>
+                    <div class="era-content">
+                        <p>在三国时期，魏国有一位医生名叫华佗，他以茶水代替酒水招待客人，以此来表达自己的节俭和健康意识，后来茶渐渐地成为了魏国民众喜爱的饮品。</p>
+                        <img class="tea-leaf" alt="茶叶" src="">
+                    </div>
+                </div> -->
+
+                <!-- 王肃与酪奴 -->
+                <div class="era">
+                    <h2>王肃与酪奴</h2>
+                    <div class="era-content">
+                        <p>王肃在南朝偏爱茗饮，北魏后虽能适应北方饮食，但坚持认为茶不应被贬低为酪浆之奴，这一故事影响了后世对茶的评价。</p>
+                        <img class="tea-leaf" alt="茶叶" src="image/魏晋南北朝王肃.jpg">
+                    </div>
+                </div>
+
+                <!-- 王濛与水厄 -->
+                <div class="era">
+                    <h2>王濛与水厄</h2>
+                    <div class="era-content">
+                        <p>王濛好饮茶，以至于宾客来访时，常戏称水厄，反映了当时饮茶的普及程度。</p>
+                        <img class="tea-leaf" alt="茶叶" src="image/王濛与水蛭.jpg">
+                    </div>
+                </div>
+
+                <!-- 晋代陆纳杖侄 -->
+                <div class="era">
+                    <h2>晋代（265年—420年）</h2>
+                    <div class="era-content">
+                        <p>晋代陆纳以俭德闻名，一次，侄子陆俶不满叔父招待的简单茶果。陆纳以教训的方式，展示了茶在简朴生活中的重要性。</p>
+                        <img class="tea-leaf" alt="茶叶" src="image/晋代陆纳.jpg">
+                    </div>
+                </div>
+
+                <!-- 陆羽与《茶经》 -->
+                <div class="era">
+                    <h2>唐代陆羽与《茶经》</h2>
+                    <div class="era-content">
+                        <p>唐朝的陆羽被誉为"茶圣"，上元初年（760年），陆羽隐居苕溪（今浙江湖州），开始撰写《茶经》。一般认为《茶经》完成于780年左右，该书是世界第一部茶叶专著，系统而全面地论述了栽茶、制茶、饮茶、评茶的方法和经验，对茶业和茶文化的发展作出了卓越贡献。</p>
+                        <img class="tea-leaf" alt="茶叶" src="image/陆羽与茶经(1).jpg">
+                    </div>
+                </div>
+
+                <!-- 茶马古道 -->
+                <div class="era">
+                    <h2>茶马古道</h2>
+                    <div class="era-content">
+                        <p>唐代中期（公元7世纪左右）茶马古道是中国南部和西南部一条历史悠久的交通路线。在古代，茶叶和其他商品是由马匹、骆驼和人力运输沿着这条路线来运送的。这条路线的开辟，使得茶叶从中国传播到了印度、欧洲和非洲等地，成为了一种世界茶文化的象征。</p>
+                        <img class="tea-leaf" alt="茶叶" src="image/茶马古道.jpg">
+                    </div>
+                </div>
+
+                <!-- 普洱茶的历史 -->
+                <!-- <div class="era">
+                    <h2>唐代（618年—907年）</h2>
+                    <div class="era-content">
+                        <p>普洱茶有着悠久的历史，早在唐朝时期就已成名。普洱茶的制作工艺独特，需要经过长时间的陈化才能达到最佳的口感和品质。普洱茶不仅具有饮用价值，还具有收藏和投资价值。</p>
+                        <img class="tea-leaf" alt="茶叶">
+                    </div>
+                </div> -->
+
+                <!-- 东坡茶 -->
+                <div class="era">
+                    <h2>宋代（960年—1279年）</h2>
+                    <div class="era-content">
+                        <p>宋代文学家苏东坡是茶文化的重要代表人物，他曾经写过一首《茶经》。这首诗表达了他对茶文化的热爱和对品茶的理解。他也被传为发明了东坡茶，使用竹筒泡茶的方法制作。这种泡法会让茶水更加清香，也更容易制作。东坡茶还因为苏东坡的名字而得名。</p>
+                        <img class="tea-leaf" alt="茶叶" src="image/东坡.jpg">
+                    </div>
+                </div>
+
+                <!-- 碧螺春的传说 -->
+                <div class="era">
+                    <h2>茶马互市</h2>
+                    <div class="era-content">
+                        <p>朱元璋设立茶马司，管理同少数民族地区的茶马交易，逐步建立起一套以茶马司为主，包括茶课司、转运司等在内的茶马互市体系。这一制度从茶叶的种植、征收、加工、存储到运输及交易等各个环节都设立了专门机构负责‌。</p>
+                        <img class="tea-leaf" src="image/茶马互市.jpg" alt="茶叶" >
+                    </div>
+                </div>
+
+                <div class="era">
+                    <h2>郑和下西洋与茶叶传播</h2>
+                    <div class="era-content">
+                        <p>郑和奉使七次远涉重洋，到达中南半岛、南洋群岛、孟加拉、印度、斯里兰卡、阿拉伯半岛等30多个国家或地区，最远到达非洲东海岸和红海沿岸。每次均携带茶叶，或赠或市，极大地促进了茶叶与茶文化在各地的流行。</p>
+                        <img class="tea-leaf" src="image/郑和.jpg" alt="茶叶">
+                    </div>
+                </div>
+
+                <!-- 龙井茶的故事 -->
+                <div class="era">
+                    <h2>清代（1644年—1911年）</h2>
+                    <div class="era-content">
+                        <p>相传乾隆皇帝下江南时，曾品尝了杭州的龙井茶，对其赞不绝口。从此，龙井茶成为了贡品，名声大振。</p>
+                        <img class="tea-leaf" alt="茶叶" src="image/乾隆下江南.jpg">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 修改后的信息栏
+        <div class="info-panel">
+            <div class="toggle-btn"></div>
+            <div class="panel-content">
+                <h3>茶文化小知识</h3>
+                <p>这里是信息内容区域，可以添加茶文化相关的文字介绍、图片等内容...</p>
+            </div>
+        </div> -->
+    </div>
+
+    <script>
+        // 导航交互逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            // 侧边栏控制
+            const sideNav = document.querySelector('.side-nav');
+            document.querySelector('.side-nav-show').addEventListener('mouseover', () => {
+                sideNav.style.left = '0';
+            });
+            sideNav.addEventListener('mouseleave', () => {
+                sideNav.style.left = '-120px';
+            });
+
+            // 页面导航
+            const pages = ['中国茶典籍数据可视化.html', '茶诗.html', '中国茶文化时间轴.html', '茶冲泡（有背景）.html', 'tea-tree.html', 'russia_trade.html'];
+            let currentPageIndex = pages.indexOf(window.location.pathname.split('/').pop()) || 2;
+
+            document.getElementById('nextPageBtn').addEventListener('click', () => {
+                currentPageIndex = (currentPageIndex + 1) % pages.length;
+                window.location.href = pages[currentPageIndex];
+            });
+
+            document.getElementById('backButton').addEventListener('click', () => {
+                currentPageIndex = (currentPageIndex - 1 + pages.length) % pages.length;
+                window.location.href = pages[currentPageIndex];
+            });
+
+            // 音乐控制
+            const musicControl = document.getElementById('musicControl');
+            const bgMusic = new Audio('av/中央民族乐团 - 渔舟唱晚.mp3');
+            bgMusic.loop = true;
+            let isPlaying = localStorage.getItem('isPlaying') === 'true';
+
+            if(isPlaying) bgMusic.play().catch(() => {});
+            musicControl.textContent = isPlaying ? '🔊' : '🎵';
+
+            musicControl.addEventListener('click', () => {
+                isPlaying = !isPlaying;
+                musicControl.textContent = isPlaying ? '🔊' : '🎵';
+                isPlaying ? bgMusic.play() : bgMusic.pause();
+                localStorage.setItem('isPlaying', isPlaying);
+            });
+
+            // 帮助系统
+            const helpInfo = document.createElement('div');
+            helpInfo.innerHTML = `
+                <h3>时间轴操作指南</h3>
+                <p>使用左右箭头浏览历史时期，鼠标悬停查看详细信息，键盘方向键也可操作。</p>
+            `;
+            helpInfo.style.cssText = 'position:fixed;top:80px;right:20px;background:rgba(248,243,233,0.95);padding:20px;border-radius:8px;display:none;';
+            document.body.appendChild(helpInfo);
+
+            document.getElementById('helpButton').addEventListener('click', () => {
+                helpInfo.style.display = helpInfo.style.display === 'block' ? 'none' : 'block';
+            });
+        });
+    </script>
+
+   <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 新增鼠标悬停交互逻辑
+            document.querySelectorAll('.era').forEach(era => {
+                era.addEventListener('mouseenter', function() {
+                    // 关闭所有其他时间栏内容
+                    document.querySelectorAll('.era-content').forEach(content => {
+                        content.style.maxHeight = '0';
+                    });
+                    // 展开当前时间栏内容
+                    this.querySelector('.era-content').style.maxHeight = '500px';
+                });
+
+                era.addEventListener('mouseleave', function() {
+                    // 关闭当前时间栏内容
+                    this.querySelector('.era-content').style.maxHeight = '0';
+                });
+            });
+
+            const eraElements = document.querySelectorAll('.era');
+            const timeline = document.querySelector('.timeline');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            let currentIndex = 0;
+            let isScrolling = false; // 防止滚动冲突
+
+            // 初始化按钮状态
+            updateButtonState();
+
+            // 按钮点击逻辑
+            prevBtn.addEventListener('click', () => scrollToEra(currentIndex - 1));
+            nextBtn.addEventListener('click', () => scrollToEra(currentIndex + 1));
+
+            // 键盘导航支持
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') prevBtn.click();
+                if (e.key === 'ArrowRight') nextBtn.click();
+            });
+
+            // 监听滚动事件更新按钮状态
+            timeline.addEventListener('scroll', () => {
+                if (isScrolling) return;
+                const scrollLeft = timeline.scrollLeft;
+                const eraWidth = eraElements[0].offsetWidth + 100; // 含间距
+                currentIndex = Math.round(scrollLeft / eraWidth);
+                updateButtonState();
+            });
+
+            // 滚动到指定时期
+            function scrollToEra(index) {
+                if (index < 0 || index >= eraElements.length) return;
+                isScrolling = true;
+                const targetEra = eraElements[index];
+                const scrollPos = targetEra.offsetLeft - (timeline.offsetWidth / 2 - targetEra.offsetWidth / 2);
+                timeline.scrollTo({
+                    left: scrollPos,
+                    behavior: 'smooth'
+                });
+                currentIndex = index;
+                updateButtonState();
+                // 解除滚动锁定
+                setTimeout(() => isScrolling = false, 500);
+            }
+
+            // 更新按钮状态
+            function updateButtonState() {
+                prevBtn.disabled = currentIndex === 0;
+                nextBtn.disabled = currentIndex === eraElements.length - 1;
+            }
+
+            // 初始化懒加载图片
+            document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+                if (img.complete) img.classList.add('loaded');
+                else img.addEventListener('load', () => img.classList.add('loaded'));
+            });
+        });
+    </script>
+</body>
+</html>
