@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>祝诗婷 · 作品集</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --border: #1e1e30;
+    --accent: #00e5ff;
+    --accent2: #7c4dff;
+    --text: #c8c8d4;
+    --text-dim: #6b6b7b;
+    --glow: 0 0 20px rgba(0, 229, 255, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* grid bg */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* ---- hero ---- */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; position: relative;
+  }
+  .hero-glow {
+    position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,229,255,0.08) 0%, transparent 70%);
+    border-radius: 50%; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); pointer-events: none;
+  }
+  .hero-content { position: relative; z-index: 1; }
+  .hero-tag {
+    display: inline-block;
+    padding: 4px 16px;
+    border: 1px solid var(--accent);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 13px;
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero-subtitle {
+    font-size: 18px; color: var(--text-dim);
+    font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+  }
+  .hero-subtitle .cursor {
+    display: inline-block; width: 10px; height: 20px;
+    background: var(--accent); margin-left: 4px;
+    animation: blink 1s step-end infinite; vertical-align: text-bottom;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .scroll-hint {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    color: var(--text-dim); font-size: 12px; letter-spacing: 2px;
+    animation: float 2s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-8px); }
+  }
+
+  /* ---- section ---- */
+  section { padding: 80px 0; }
+  .section-label {
+    font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+    font-size: 12px; color: var(--accent);
+    letter-spacing: 3px; margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: 28px; color: #fff; margin-bottom: 40px;
+    font-weight: 600; letter-spacing: -1px;
+  }
+
+  /* ---- about ---- */
+  .about-text {
+    font-size: 16px; color: var(--text-dim);
+    max-width: 600px; line-height: 1.8;
+  }
+
+  /* ---- project card ---- */
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 36px;
+    margin-bottom: 32px;
+    transition: all 0.3s ease;
+    position: relative; overflow: hidden;
+  }
+  .project-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .project-card:hover { border-color: var(--accent); box-shadow: var(--glow); }
+  .project-card:hover::before { opacity: 1; }
+
+  .project-card h3 {
+    font-size: 22px; color: #fff; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .project-card .badge {
+    font-size: 11px; padding: 2px 10px;
+    border-radius: 10px; letter-spacing: 1px;
+    font-weight: 400;
+  }
+  .badge-ml { background: rgba(124,77,255,0.2); color: var(--accent2); border: 1px solid rgba(124,77,255,0.3); }
+  .badge-viz { background: rgba(0,229,255,0.1); color: var(--accent); border: 1px solid rgba(0,229,255,0.3); }
+
+  .project-card .desc { color: var(--text-dim); margin: 16px 0; font-size: 14px; line-height: 1.7; }
+
+  .highlight-list {
+    list-style: none; margin: 16px 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 10px;
+  }
+  .highlight-list li {
+    padding: 10px 14px; font-size: 13px; color: var(--text);
+    background: rgba(255,255,255,0.03);
+    border-left: 2px solid var(--accent2);
+    border-radius: 0 6px 6px 0;
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 20px; border-radius: 6px;
+    font-size: 13px; text-decoration: none;
+    transition: all 0.2s; cursor: pointer; border: none;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--accent); color: #000;
+    font-weight: 600;
+  }
+  .btn-primary:hover { box-shadow: 0 0 24px rgba(0,229,255,0.4); }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border); color: var(--text);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: #fff; }
+
+  /* ---- sub-page gallery ---- */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px; margin-top: 24px;
+  }
+  .gallery-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 24px 18px;
+    text-decoration: none; color: var(--text);
+    transition: all 0.25s; text-align: center;
+  }
+  .gallery-item:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+    box-shadow: var(--glow);
+  }
+  .gallery-item .icon {
+    font-size: 32px; margin-bottom: 10px; display: block;
+  }
+  .gallery-item .title { font-size: 14px; color: #fff; margin-bottom: 4px; }
+  .gallery-item .sub { font-size: 12px; color: var(--text-dim); }
+
+  /* ---- contact ---- */
+  .contact-row {
+    display: flex; gap: 24px; flex-wrap: wrap;
+  }
+  .contact-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 20px 28px;
+    display: flex; align-items: center; gap: 12px;
+    transition: all 0.25s;
+  }
+  .contact-item:hover { border-color: var(--accent); }
+  .contact-item .label { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; }
+  .contact-item .value { font-size: 15px; color: #fff; }
+  .contact-item .value a { color: var(--accent); text-decoration: none; }
+
+  /* ---- footer ---- */
+  footer {
+    text-align: center; padding: 40px 0;
+    color: var(--text-dim); font-size: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ---- particles ---- */
+  .particles {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%; pointer-events: none; z-index: 0;
+  }
+  .particle {
+    position: absolute; width: 2px; height: 2px;
+    background: var(--accent); border-radius: 50%;
+    animation: drift linear infinite;
+  }
+  @keyframes drift {
+    0% { transform: translateY(0) translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100vh) translateX(40px); opacity: 0; }
+  }
+
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 32px; }
+    .gallery { grid-template-columns: repeat(2, 1fr); }
+    .highlight-list { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- particles -->
+<div class="particles" id="particles"></div>
+
+<!-- hero -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-tag">PORTFOLIO</div>
+    <h1>祝诗婷</h1>
+    <p class="hero-subtitle">
+      > 爱 vibecoding 的小机器人<span class="cursor"></span>
+    </p>
+  </div>
+  <div class="scroll-hint">↓ 往下看</div>
+</section>
+
+<!-- 关于我 -->
+<section class="container">
+  <div class="section-label">01 / 关于我</div>
+  <h2 class="section-title">你好，我是祝诗婷</h2>
+  <p class="about-text">
+    热爱通过代码将数据转化为直观、美观的可视化作品。擅长项目统筹与团队协作，从数据收集、标注到模型训练、成果汇报都有实战经验。追求「让数据自己说话」的表达方式。
+  </p>
+</section>
+
+<!-- 项目一：图像识别模型 -->
+<section class="container">
+  <div class="section-label">02 / 项目作品</div>
+  <h2 class="section-title">精选项目</h2>
+
+  <div class="project-card">
+    <h3>
+      辅助视障人士的图像识别模型
+      <span class="badge badge-ml">机器学习</span>
+    </h3>
+    <p class="desc">
+      组织 20 人团队，围绕视障人士出行困难这一痛点，设计辅助识别交通信号灯、斑马线及盲道的图像识别模型。通过嘉楠开发者社区平台完成模型训练与开发板测试，最终面向 70+ 人进行成果汇报。
+    </p>
+    <ul class="highlight-list">
+      <li>组织 20 名成员讨论选题并拆分任务，根据成员能力分配工作</li>
+      <li>设计分阶段工作计划与时间表，使用 Project 工具管理进度</li>
+      <li>从清晰度、质量、数量三维度设计中期评价表，组织匿名互评</li>
+      <li>独立完成模型训练与两次测试修改，验证准确度</li>
+      <li>以多维度权重核算完成所有成员的最终评分</li>
+    </ul>
+    <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
+      <a href="图像识别模型项目汇报.pdf" class="btn btn-primary" download>下载项目报告 PDF</a>
+      <span style="font-size:12px;color:var(--text-dim);display:flex;align-items:center;">PDF 约 3.5MB</span>
+    </div>
+  </div>
+
+  <!-- 项目二：茶文化数据可视化 -->
+  <div class="project-card">
+    <h3>
+      茶韵数观 - 中国古代茶文化图鉴
+      <span class="badge badge-viz">数据可视化</span>
+    </h3>
+    <p class="desc">
+      以中国茶文化为主题的数据可视化作品，涵盖典籍诗词、历史演进、冲泡技艺、茶馆文化及对外贸易等多个维度。使用 ECharts 构建交互式图表，搭配古风视觉设计，呈现茶文化的千年脉络。
+    </p>
+    <div class="gallery">
+      <a href="数据可视化项目/index.html" class="gallery-item" target="_blank">
+        <span class="icon">首页</span>
+        <span class="title">品茗首页</span>
+        <span class="sub">项目主页</span>
+      </a>
+      <a href="数据可视化项目/茶典籍.html" class="gallery-item" target="_blank">
+        <span class="icon">茶韵</span>
+        <span class="title">诗词古韵</span>
+        <span class="sub">茶典籍可视化</span>
+      </a>
+      <a href="数据可视化项目/茶诗.html" class="gallery-item" target="_blank">
+        <span class="icon">咏茶</span>
+        <span class="title">茶诗</span>
+        <span class="sub">历代茶诗赏析</span>
+      </a>
+      <a href="数据可视化项目/时间轴.html" class="gallery-item" target="_blank">
+        <span class="icon">茶史</span>
+        <span class="title">千年溯源</span>
+        <span class="sub">茶文化时间轴</span>
+      </a>
+      <a href="数据可视化项目/茶冲泡.html" class="gallery-item" target="_blank">
+        <span class="icon">茶艺</span>
+        <span class="title">百茶汇萃</span>
+        <span class="sub">冲泡技艺</span>
+      </a>
+      <a href="数据可视化项目/茶种植地域.html" class="gallery-item" target="_blank">
+        <span class="icon">茶源</span>
+        <span class="title">种植地域</span>
+        <span class="sub">产地分布图</span>
+      </a>
+      <a href="数据可视化项目/茶馆1.html" class="gallery-item" target="_blank">
+        <span class="icon">茶馆</span>
+        <span class="title">茶馆文化 ①</span>
+        <span class="sub">历代茶馆演变</span>
+      </a>
+      <a href="数据可视化项目/茶馆2.html" class="gallery-item" target="_blank">
+        <span class="icon">茶馆</span>
+        <span class="title">茶馆文化 ②</span>
+        <span class="sub">茶馆社会功能</span>
+      </a>
+      <a href="数据可视化项目/中俄贸易.html" class="gallery-item" target="_blank">
+        <span class="icon">中俄</span>
+        <span class="title">中俄茶叶贸易</span>
+        <span class="sub">贸易数据可视化</span>
+      </a>
+      <a href="数据可视化项目/中英贸易.html" class="gallery-item" target="_blank">
+        <span class="icon">中英</span>
+        <span class="title">中英茶叶贸易</span>
+        <span class="sub">贸易数据可视化</span>
+      </a>
+      <a href="数据可视化项目/中美贸易.html" class="gallery-item" target="_blank">
+        <span class="icon">中美</span>
+        <span class="title">中美茶叶贸易</span>
+        <span class="sub">贸易数据可视化</span>
+      </a>
+      <a href="数据可视化项目/中荷贸易.html" class="gallery-item" target="_blank">
+        <span class="icon">中荷</span>
+        <span class="title">中荷茶叶贸易</span>
+        <span class="sub">贸易数据可视化</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 联系方式 -->
+<section class="container">
+  <div class="section-label">03 / 联系我</div>
+  <h2 class="section-title">联系方式</h2>
+  <div class="contact-row">
+    <div class="contact-item">
+      <div>
+        <div class="label">邮箱</div>
+        <div class="value"><a href="mailto:zhu_shiting@126.com">zhu_shiting@126.com</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2026 祝诗婷 · 由 Claude Code 辅助制作</p>
+</footer>
+
+<script>
+// 粒子效果
+(function() {
+  const container = document.getElementById('particles');
+  const count = 30;
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.top = (50 + Math.random() * 100) + '%';
+    p.style.animationDuration = (8 + Math.random() * 15) + 's';
+    p.style.animationDelay = Math.random() * 10 + 's';
+    p.style.width = (1 + Math.random() * 2) + 'px';
+    p.style.height = p.style.width;
+    container.appendChild(p);
+  }
+})();
+</script>
+
+</body>
+</html>
