@@ -1,0 +1,164 @@
+{
+    "nodes": [
+      {
+        "name": "唐",
+        "itemStyle": { "color": "#db8e5a" },
+        "depth": 0
+      },
+      {
+        "name": "明",
+        "itemStyle": { "color": "#5D4037" },
+        "depth": 0
+      },
+      {
+        "name": "清",
+        "itemStyle": { "color": "#a94927" },
+        "depth": 0
+      },
+      {
+        "name": "绿茶",
+        "depth": 1,
+        "itemStyle": { "color": "#7d9d41" },
+        "y": 200
+      },
+      {
+        "name": "白茶",
+        "depth": 1,
+        "itemStyle": { "color": "#ffe5d9" },
+        "y": 210
+      },
+      {
+        "name": "黄茶",
+        "depth": 1,
+        "itemStyle": { "color": "#f5e547" },
+        "y": 220
+      },
+      {
+        "name": "红茶",
+        "depth": 1,
+        "itemStyle": { "color": "#cf4831" },
+        "y": 230
+      },
+      {
+        "name": "乌龙茶",
+        "depth": 1,
+        "itemStyle": { "color": "#a68a6a" },
+        "y": 240
+      },
+      {
+        "name": "黑茶",
+        "depth": 1,
+        "itemStyle": { "color": "#546E7A" },
+        "y": 250
+      },
+      {
+        "name": "花茶",
+        "depth": 1,
+        "itemStyle": { "color": "#f7d193" },
+        "y": 260
+      },
+      {
+        "name": "紧压茶",
+        "depth": 1,
+        "itemStyle": { "color": "#B0BEC5" },
+        "y": 270
+      },
+      {
+        "name": "窨制后直接冲泡",
+        "depth": 3,
+        "itemStyle": { "color": "#FF5722" },
+        "y": 30
+      },
+      {
+        "name": "瀹饮法（直接冲泡）",
+        "depth": 3,
+        "itemStyle": { "color": "#3F51B5" },
+        "y": 70
+      },
+      {
+        "name": "闷黄工艺后沸水冲泡",
+        "depth": 3,
+        "itemStyle": { "color": "#CDDC39" },
+        "y": 110
+      },
+      {
+        "name": "煎茶法（烤饼碾末煮饮）",
+        "depth": 3,
+        "itemStyle": { "color": "#009688" },
+        "y": 150
+      },
+      {
+        "name": "蒸压后掰碎煮饮/冲泡",
+        "depth": 3,
+        "itemStyle": { "color": "#FF4081" },
+        "y": 190
+      },
+      {
+        "name": "高温冲泡/煮饮",
+        "depth": 3,
+        "itemStyle": { "color": "#9E9E9E" },
+        "y": 230
+      },
+      {
+        "name": "自然萎凋清饮/煮饮",
+        "depth": 3,
+        "itemStyle": { "color": "#8D6E63" },
+        "y": 270
+      },
+      {
+        "name": "功夫茶泡法（多次冲泡）",
+        "depth": 3,
+        "itemStyle": { "color": "#4DB6AC" },
+        "y": 310
+      },
+      {
+        "name": "再加工茶类",
+        "depth": 2,
+        "itemStyle": { "color": "#FF5726" }
+      }
+    ],
+    "links": [
+      { "source": "唐", "target": "绿茶", "value": 0.1 },
+      { "source": "绿茶", "target": "煎茶法（烤饼碾末煮饮）", "value": 0.1 },
+      { "source": "唐", "target": "红茶", "value": 0.1 },
+      { "source": "红茶", "target": "煎茶法（烤饼碾末煮饮）", "value": 0.1 },
+      { "source": "唐", "target": "黑茶", "value": 0.1 },
+      { "source": "黑茶", "target": "自然萎凋清饮/煮饮", "value": 0.1 },
+      { "source": "唐", "target": "乌龙茶", "value": 0.1 },
+      { "source": "乌龙茶", "target": "高温冲泡/煮饮", "value": 0.1 },
+      { "source": "唐", "target": "黄茶", "value": 0.1 },
+      { "source": "黄茶", "target": "煎茶法（烤饼碾末煮饮）", "value": 0.1 },
+      { "source": "唐", "target": "白茶", "value": 0.1 },
+      { "source": "白茶", "target": "自然萎凋清饮/煮饮", "value": 0.1 },
+      { "source": "唐", "target": "花茶", "value": 0.1 },
+      { "source": "花茶", "target": "窨制后直接冲泡", "value": 0.1 },
+      { "source": "明", "target": "绿茶", "value": 0.1 },
+      { "source": "绿茶", "target": "瀹饮法（直接冲泡）", "value": 0.1 },
+      { "source": "明", "target": "白茶", "value": 0.1 },
+      { "source": "白茶", "target": "自然萎凋清饮/煮饮", "value": 0.1 },
+      { "source": "明", "target": "黑茶", "value": 0.1 },
+      { "source": "黑茶", "target": "自然萎凋清饮/煮饮", "value": 0.1 },
+      { "source": "明", "target": "乌龙茶", "value": 0.1 },
+      { "source": "乌龙茶", "target": "高温冲泡/煮饮", "value": 0.1 },
+      { "source": "明", "target": "紧压茶", "value": 0.1 },
+      { "source": "紧压茶", "target": "蒸压后掰碎煮饮/冲泡", "value": 0.1 },
+      { "source": "明", "target": "黄茶", "value": 0.1 },
+      { "source": "黄茶", "target": "闷黄工艺后沸水冲泡", "value": 0.1 },
+      { "source": "明", "target": "花茶", "value": 0.1 },
+      { "source": "花茶", "target": "窨制后直接冲泡", "value": 0.1 },
+      { "source": "明", "target": "红茶", "value": 0.1 },
+      { "source": "红茶", "target": "高温冲泡/煮饮", "value": 0.1 },
+      { "source": "清", "target": "乌龙茶", "value": 0.1 },
+      { "source": "乌龙茶", "target": "功夫茶泡法（多次冲泡）", "value": 0.1 },
+      { "source": "清", "target": "绿茶", "value": 0.1 },
+      { "source": "绿茶", "target": "煎茶法（烤饼碾末煮饮）", "value": 0.1 },
+      { "source": "清", "target": "红茶", "value": 0.1 },
+      { "source": "红茶", "target": "高温冲泡/煮饮", "value": 0.1 },
+      { "source": "清", "target": "黄茶", "value": 0.1 },
+      { "source": "黄茶", "target": "闷黄工艺后沸水冲泡", "value": 0.1 },
+      { "source": "清", "target": "白茶", "value": 0.1 },
+      { "source": "白茶", "target": "自然萎凋清饮/煮饮", "value": 0.1 },
+      { "source": "清", "target": "再加工茶类", "value": 0.1 },
+      { "source": "再加工茶类", "target": "蒸压后掰碎煮饮/冲泡", "value": 0.1 }
+    ]
+  }
