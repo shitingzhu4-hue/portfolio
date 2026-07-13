@@ -1,0 +1,10 @@
+.teaChart {
+    width: 90%; /* 占据屏幕宽度的85% */
+    height: 85vh; /* 高度为视口高度的70%，可根据需要调整 */
+    margin: 0 auto; /* 水平居中 */
+    position: absolute; /* 绝对定位 */
+    top: 50%; /* 垂直居中 */
+    left: 50%; /* 水平居中 */
+    transform: translate(-50%, -50%); /* 精确居中 */
+    z-index: 1; /* 确保层级 */
+}
