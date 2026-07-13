@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>茶馆功能演化水平树图</title>
+    <script src="js/echarts.min1.js"></script>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'SimSun', '宋体', serif;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        #main {
+            width: 100vw;
+            height: 100vh;
+            min-width: 1600px;
+            min-height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .chart-title {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            color: rgba(70, 99, 88, 0.95);
+            font-family: 'KaiTi', cursive;
+            font-size: 36px;
+            font-weight: bold;
+            padding: 10px 30px;
+        }
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: 
+                url('img/background2.jpg') center/cover no-repeat;
+            pointer-events: none;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 蓝绿色茶文化主题侧边导航栏 */
+        .side-nav {
+            position: fixed;
+            top: 0;
+            left: -120px;
+            width: 120px;
+            height: 100vh;
+            background-color: rgba(124, 156, 144, 0.95);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 60px;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .side-nav-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 40px;
+            background-color: #f8f3e9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: #3a8c7d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .side-nav-item {
+            width: 80%;
+            margin: 15px 0;
+            padding: 12px 0;
+            color: #f8f3e9;
+            text-align: center;
+            border-top: 1px solid rgba(248, 243, 233, 0.3);
+            border-bottom: 1px solid rgba(248, 243, 233, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            text-decoration: none;
+        }
+
+        .side-nav-item:hover {
+            background-color: rgba(248, 243, 233, 0.2);
+            transform: translateX(5px);
+        }
+
+        .side-nav-item:hover::before {
+            content: "";
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 2px;
+            background-color: #f8f3e9;
+        }
+
+        .side-nav-text {
+            font-size: 14px;
+            letter-spacing: 2px;
+            font-weight: normal;
+            text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .side-nav-icon {
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+
+        .side-nav-show {
+            position: fixed;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 50px;
+            background-color: rgba(124, 156, 144, 0.7);
+            cursor: pointer;
+            z-index: 9;
+            border-radius: 0 5px 5px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        .side-nav-show:hover {
+            background-color: rgba(124, 156, 144, 1);
+        }
+
+        /* 右侧跳转箭头 */
+        .next-page-arrow {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: rgba(124, 156, 144, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        /* 顶部控制按钮容器 */
+        .top-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        /* 顶部控制按钮的通用样式 */
+        .control-button {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(124, 156, 144, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-button:hover {
+            background-color: rgba(124, 156, 144, 1);
+        }
+
+        .control-icon {
+            color: white;
+            font-size: 20px;
+        }
+
+        /* 帮助信息框 */
+        .help-info {
+            margin: 0;
+            box-sizing: border-box;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            width: 300px;
+            background-color: rgba(248, 243, 233, 0.95);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            display: none;
+        }
+
+        .help-info h3 {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: '宋体', cursive;
+            color: #3a8c7d;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .help-content-container {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .help-info p {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: '宋体', cursive;
+            color: black;
+            font-size: 14px;
+            line-height: 1.6;
+            text-indent: 2em; /* 首行缩进两个字符 */
+            margin: 0.5em; /* 调整后的段落间距 */
+            overflow-wrap: break-word; /* 允许长单词换行 */
+            word-break: break-all;     /* 强制在任意字符处换行 */
+        }
+
+        .no-indent {
+            text-indent: 0 !important;
+            font-weight: bold;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .side-nav {
+                width: 80px;
+            }
+            
+            .side-nav-logo {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+                margin-bottom: 30px;
+            }
+            
+            .side-nav-text {
+                display: none;
+            }
+            
+            .side-nav-item {
+                padding: 12px 0;
+            }
+            
+            .next-page-arrow {
+                width: 40px;
+                height: 40px;
+                right: 10px;
+            }
+            
+            .top-controls {
+                gap: 10px;
+            }
+            
+            .control-button {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .help-info {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                width: 250px;
+                top: 50px;
+                right: 10px;
+            }
+            
+            .help-content-container {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                max-height: 150px;
+            }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+     
+       .qiehuan{
+            position: fixed;
+            top: 110px;
+            left: 150px;
+            z-index: 100;
+           
+        }
+        .qiehuan img{
+            width: 190px;
+            height: 150px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="qiehuan">
+        <a href="茶馆2.html" class="chart-switch">
+            <img src="img/cha2-removebg-preview.png" alt="茶馆照片">
+        </a> 
+        
+    </div>
+    <div class="chart-title">历代茶馆发展史</div>
+    <div class="background-container"></div>
+    <div id="main"></div>
+    <nav class="side-nav">
+        <div class="side-nav-logo">茶</div>
+        
+        <a href="index.html" class="side-nav-item">
+            <div class="side-nav-icon">首页</div>
+            <div class="side-nav-text">品茗首页</div>
+        </a>
+    
+        <a href="茶典籍.html" class="side-nav-item">
+            <div class="side-nav-icon">茶韵</div>
+            <div class="side-nav-text">诗词古韵</div>
+        </a>
+    
+        <a href="时间轴.html" class="side-nav-item">
+            <div class="side-nav-icon">茶史</div>
+            <div class="side-nav-text">千年溯源</div>
+        </a>
+    
+        <a href="茶冲泡.html" class="side-nav-item">
+            <div class="side-nav-icon">茶艺</div>
+            <div class="side-nav-text">百茶汇萃</div>
+        </a>
+    
+        <a href="中俄贸易.html" class="side-nav-item">
+            <div class="side-nav-icon">茶贸</div>
+            <div class="side-nav-text">四海飘香</div>
+        </a>
+    </nav>
+
+    <div class="side-nav-show"></div>
+
+    <div class="next-page-arrow" id="nextPageBtn">
+        <div class="arrow-icon">›</div>
+    </div>
+
+    <div class="top-controls">
+        <div class="control-button" id="musicControl">
+            <div class="control-icon music-icon">♫</div>
+        </div>
+        
+        <div class="control-button" id="helpButton">
+            <div class="control-icon help-icon">?</div>
+        </div>
+        
+        <div class="control-button" id="backButton">
+            <div class="control-icon back-icon">←</div>
+        </div>
+    </div>
+
+    <div class="help-info" id="helpInfo">
+        <h3>茶馆功能演化</h3>
+        <div class="help-content-container">
+            <p class="no-indent">页面介绍：</p> 
+            <p>本页通过水平树状图展现历代茶馆功能演化脉络：</p> 
+            <p>1. 层级架构：根节点（茶馆）- 朝代节点（魏晋至清代）- 功能分类（社会功能/名称类型）- 具体条目</p> 
+            <p>2. 交互设计：点击节点展开层级/悬停显示详细信息/右侧箭头切换视图模式</p> 
+            <p>3. 配色逻辑：朝代节点采用茶汤色系渐变（魏晋褐→唐檀→宋橄→明绿→清青）</p> 
+            <p>数据覆盖5个历史时期共计83项功能条目与68种茶馆称谓</p> 
+            <p class="no-indent">数据结论：</p> 
+            <p >中国茶馆起源于早期的流动茶摊和“茶寮”，魏晋南北朝时期已有雏形。</p>
+            <p>唐代茶馆开始形成，出现了“茶肆”“茶寮”“茶坊”等称呼，陆羽《茶经》的传播促进了茶文化的兴起。 </p>
+            <p>宋代茶馆繁荣，城市和乡村广泛分布，经营机制不断完善，数量增多且分布广泛。除提供茶饮外，还注重环境营造，出现高档茶楼，环境优雅且有文艺表演，成为文人墨客的聚会场所。 </p>
+            <p>明清时期茶馆达到封建社会的顶峰，数量众多、分布广泛，且装修更精纯雅致，有大众茶馆和高端茶馆之分，类型丰富，功能也更加多样化。除了社交休闲，还兼具审美功能，茶馆室内外环境布置精美，与园林景观结合，内有音乐、戏曲、评书、绘画、书法、诗词等文艺活动，成为艺术欣赏与文化交流的重要场所，同时商业功能也进一步发展。</p>
+            <p class="no-indent">数据来源：</p>
+            <p>[1]汪红亮.明代茶馆浅析[J].农业考古,2013,(05):101-104.</p>
+            <p>[2]刘兴祝.浅谈茶馆的起源与发展[J].科技信息,2010,(22):547-548.</p> 
+            <p>[3]纪荣全,程祖芳,任燕.茶馆的发展历史及其主要功能概述[J].蚕桑茶叶通讯,2021,(03):32-35.</p>
+            <p>[4]张丽娜,刘娜.宋代茶馆的特征与社会影响[J].兰台世界,2015,(36):108-109.DOI:10.16565/j.cnki.1006-7744.2015.36.57.</p>
+        </div>
+    </div>
+    <!-- 新增切换按钮 -->
+    <a href="茶馆2.html" class="chart-switch">
+        <span class="switch-icon">♻</span>
+        <span>切换辐射视图</span>
+    </a>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // 页面跳转逻辑
+            let currentPageIndex = 0;
+
+            // 下一页按钮点击事件
+            document.getElementById('nextPageBtn').addEventListener('click', function () {
+                // 获取当前页面的索引
+                const pages = ['茶馆1.html', '茶馆2.html', '中俄贸易.html', '中英贸易.html', '中荷贸易.html', '中美贸易.html', 'index.html', '茶典籍.html', '茶诗.html', '时间轴.html', '茶种植地域.html', '茶冲泡.html'];
+                const currentPage = window.location.pathname.split('/').pop();
+                currentPageIndex = pages.indexOf(currentPage) !== -1 ? pages.indexOf(currentPage) : 0;
+
+                if (currentPageIndex < pages.length - 1) {
+                    currentPageIndex++;
+                    window.location.href = pages[currentPageIndex];
+                } else {
+                    window.location.href = pages[0];
+                }
+            });
+
+            // 返回按钮点击事件
+            document.getElementById('backButton').addEventListener('click', function () {
+                // 获取当前页面的索引
+                const pages = ['茶馆1.html', '茶馆2.html', '中俄贸易.html', '中英贸易.html', '中荷贸易.html', '中美贸易.html', 'index.html', '茶典籍.html', '茶诗.html', '时间轴.html', '茶种植地域.html', '茶冲泡.html'];
+                const currentPage = window.location.pathname.split('/').pop();
+                currentPageIndex = pages.indexOf(currentPage) !== -1 ? pages.indexOf(currentPage) : 0;
+
+                if (currentPageIndex > 0) {
+                    currentPageIndex--;
+                    window.location.href = pages[currentPageIndex];
+                } else {
+                    window.location.href = pages[pages.length - 1];
+                }
+            });
+
+            // 音乐控制
+            const musicControl = document.getElementById('musicControl');
+            const backgroundMusic = new Audio('av/中央民族乐团 - 渔舟唱晚.mp3');
+            backgroundMusic.loop = true;
+            let isPlaying = false;
+
+            // 检查是否有存储的播放状态
+            const storedIsPlaying = localStorage.getItem('isPlaying');
+            if (storedIsPlaying === 'true') {
+                backgroundMusic.play().catch(e => console.log('播放音乐出错:', e));
+                musicControl.innerHTML = '<div class="control-icon music-icon">🔊</div>';
+                isPlaying = true;
+            }
+
+            // 音乐播放状态变化时存储状态
+            backgroundMusic.addEventListener('play', function () {
+                localStorage.setItem('isPlaying', 'true');
+            });
+
+            backgroundMusic.addEventListener('pause', function () {
+                localStorage.setItem('isPlaying', 'false');
+            });
+
+            // 音乐控制逻辑
+            musicControl.addEventListener('click', function () {
+                if (isPlaying) {
+                    backgroundMusic.pause();
+                    this.innerHTML = '<div class="control-icon music-icon">♫</div>';
+                    isPlaying = false;
+                } else {
+                    backgroundMusic.play().catch(e => console.log('播放音乐出错:', e));
+                    this.innerHTML = '<div class="control-icon music-icon">🔊</div>';
+                    isPlaying = true;
+                }
+            });
+
+            // 问号按钮点击事件
+            document.getElementById('helpButton').addEventListener('click', function () {
+                const helpInfo = document.getElementById('helpInfo');
+                if (helpInfo.style.display === 'block') {
+                    helpInfo.style.display = 'none';
+                } else {
+                    helpInfo.style.display = 'block';
+                }
+            });
+
+            // 显示/隐藏侧边导航栏
+            document.querySelector('.side-nav-show').addEventListener('mouseover', function () {
+                document.querySelector('.side-nav').style.left = '0';
+            });
+
+            document.querySelector('.side-nav').addEventListener('mouseleave', function () {
+                this.style.left = '-120px';
+            });
+
+            // 确保侧边栏初始状态正确
+            document.querySelector('.side-nav').style.left = '-120px';
+
+            // 页面卸载时保存音乐播放状态
+            window.addEventListener('beforeunload', function () {
+                localStorage.setItem('isPlaying', isPlaying ? 'true' : 'false');
+            });
+        });
+        // 配色方案
+        const colorMap = {
+            '魏晋南北朝': { node: '#6F4E37', text: '#6F4E37' },
+            '唐代': { node: '#A0522D', text: '#A0522D' },
+            '宋代': { node: '#556B2F', text: '#556B2F' },
+            '明代': { node: '#6B8E23', text: '#6B8E23' },
+            '清代': { node: '#8FBC8F', text: '#8FBC8F' }
+        };
+
+        // 树形数据结构（保持不变）
+        const treeData = {
+            "name": "茶馆",
+            "children": [
+                {
+                    "name": "魏晋南北朝",
+                    "children": [
+                        {
+                            "name": "社会功能",
+                            "children": [
+                                {"name": "饮茶解渴"},
+                                {"name": "社交娱乐"},
+                                {"name": "商业服务功能萌芽"}
+                            ]
+                        },
+                        {
+                            "name": "名称类型",
+                            "children": [
+                                {"name": "流动茶摊"},
+                                {"name": "茶寮"}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "唐代",
+                    "children": [
+                        {
+                            "name": "社会功能",
+                            "children": [
+                                {"name": "社交休闲场所"},
+                                {"name": "经济交易"},
+                                {"name": "文化传播的初步阵地"}
+                            ]
+                        },
+                        {
+                            "name": "名称类型",
+                            "children": [
+                                {"name": "茶肆"},
+                                {"name": "茶房"},
+                                {"name": "茶楼"},
+                                {"name": "茶邸"}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "宋代",
+                    "children": [
+                        {
+                            "name": "社会功能",
+                            "children": [
+                                {"name": "弦歌表演"},
+                                {"name": "博弈下棋"},
+                                {"name": "聚会交流"},
+                                {"name": "信息传播"},
+                                {"name": "商务洽谈"},
+                                {"name": "文化传播载体"},
+                                {"name": "茶叶消费市场"},
+                                {"name": "休息场所"},
+                                {"name": "住宿服务"},
+                                {"name": "餐饮服务"}
+                            ]
+                        },
+                        {
+                            "name": "名称类型",
+                            "children": [
+                                {"name": "茶坊"},
+                                {"name": "茶楼"},
+                                {"name": "茶邸"},
+                                {"name": "茶担"},
+                                {"name": "茶摊"},
+                                {"name": "茶铺"},
+                                {"name": "茶店"},
+                                {"name": "茶寮"},
+                                {"name": "茶肆"},
+                                {"name": "茶房"},
+                                {"name": "茶社"},
+                                {"name": "茶亭"}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "明代",
+                    "children": [
+                        {
+                            "name": "社会功能",
+                            "children": [
+                                {"name": "满足饮食消费需求"},
+                                {"name": "提供社交空间"},
+                                {"name": "传承饮茶传统"},
+                                {"name": "推动茶文化创新"},
+                                {"name": "促进阶层之间交流"},
+                                {"name": "推动公共事务讨论"},
+                                {"name": "反映城市的繁荣程度"},
+                                {"name": "带动商业发展"}
+                            ]
+                        },
+                        {
+                            "name": "名称类型",
+                            "children": [
+                                {"name": "茶馆."},
+                                {"name": "茶坊"},
+                                {"name": "茶肆"},
+                                {"name": "茶舍"},
+                                {"name": "茶房"},
+                                {"name": "茶食店"},
+                                {"name": "茶社"},
+                                {"name": "茶棚"},
+                                {"name": "茶摊"},
+                                {"name": "茶楼"},
+                                {"name": "茶亭"}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "清代",
+                    "children": [
+                        {
+                            "name": "社会功能",
+                            "children": [
+                                {"name": "休闲娱乐"},
+                                {"name": "止渴充饥"},
+                                {"name": "信息传播"},
+                                {"name": "文化传播"},
+                                {"name": "行业会聚"},
+                                {"name": "商务洽谈和交易"},
+                                {"name": "人才市场"},
+                                {"name": "吸纳就业（中下层人民）"},
+                                {"name": "仲裁审判（解决民间纠纷）"}
+                            ]
+                        },
+                        {
+                            "name": "名称类型",
+                            "children": [
+                                {"name": "茶馆."},
+                                {"name": "茶楼"},
+                                {"name": "茶肆"},
+                                {"name": "茶坊"},
+                                {"name": "茶房"},
+                                {"name": "茶亭"},
+                                {"name": "茶厅"},
+                                {"name": "茶座"},
+                                {"name": "茶社"},
+                                {"name": "茶棚"},
+                                {"name": "茶寮"},
+                                {"name": "茶室"},
+                                {"name": "茶屋"},
+                                {"name": "茶居"},
+                                {"name": "茶铺"},
+                                {"name": "茶店"},
+                                {"name": "茶担"}
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // 递归处理数据和颜色
+    function processNode(node, parentColor = { node: '#ccc', text: '#ccc' }) {
+        let currentColor;
+        // 显式设置根节点颜色
+        if (node.name === "茶馆") {
+            currentColor = { node: '#ccc', text: '#ccc' };
+        } else {
+            currentColor = colorMap[node.name] || parentColor;
+        }
+
+        // 设置折叠状态：名称类型节点默认折叠
+        if (node.name === "名称类型") {
+            node.collapsed = true;
+        } else {
+            node.collapsed = false;
+        }
+
+        // 保存颜色到节点数据
+        node.color = currentColor;
+
+        node.itemStyle = {
+            color: currentColor.node,
+            borderColor: '#666',
+            borderWidth: 1
+        };
+
+        node.lineStyle = {
+            color: currentColor.node,
+            width: 2
+        };
+
+        // ✅ 修改：只设置子节点的 label 样式（排除根节点）
+        if (node.name !== "茶馆") {
+            node.label = {
+                color: currentColor.text,
+                position: 'right',
+                verticalAlign: 'middle',
+                align: 'left',
+                // 子节点字体样式（除根节点外）
+                fontFamily: 'KaiTi, 楷体, sans-serif', // 楷体
+                fontSize: 15,
+                backgroundColor: 'rgba(245, 245, 220, 0.9)',
+                borderRadius: 4
+            };
+        }
+
+        if (node.children) {
+            node.children.forEach(child => {
+                processNode(child, currentColor); // 子节点继承当前颜色
+            });
+        }
+    }
+
+// 处理根节点
+processNode(treeData);
+// 处理根节点特殊样式（保持不变）
+treeData.label = {
+    position: 'right',
+    distance: 30,
+    color: '#3a8c7d',
+    fontFamily: 'KaiTi, 楷体, sans-serif', // 根节点字体（保持不变）
+    fontSize: 20,
+    fontWeight: 'bold',
+    backgroundColor: 'rgba(245, 245, 220, 0.9)',
+    borderRadius: 10
+};
+
+// 初始化图表
+const myChart = echarts.init(document.getElementById('main'));
+
+// 配置项
+myChart.setOption({
+    tooltip: {
+        trigger: 'item',
+        triggerOn: 'mousemove'
+    },
+    series: [{
+        type: 'tree',
+        data: [treeData],
+        layout: 'orthogonal',
+        orient: 'LR',
+        top: '10%',
+        left: '10%',
+        bottom: '10%',
+        right: '20%',
+        symbolSize: 12,
+
+        // 间距控制
+        layerPadding: '10%',
+        nodePadding: '10%',
+        
+        // ✅ 修改：移除全局 label 配置，避免覆盖节点自定义样式
+        // label: { ... }, // 注释掉或删除
+
+        leaves: {
+            label: {
+                position: 'right',
+                verticalAlign: 'middle',
+                align: 'left',
+                // 叶子节点字体样式
+                fontFamily: 'KaiTi, 楷体, sans-serif', // 楷体
+                fontSize: 12, // 叶子节点字体稍小
+                color: (params) => params.data.color.text,
+                backgroundColor: 'rgba(255,255,255,0.9)',  
+                borderRadius: 10,
+                padding: 0
+            },
+            itemStyle: {
+                color: '#F4A460',
+                borderColor: '#666'
+            }
+        },
+        
+        lineStyle: {
+            color: (params) => params.data.lineStyle.color,
+            width: 0.5,
+            curveness: 0.3
+        },
+        expandAndCollapse: true,
+        animationDuration: 550,
+        animationDurationUpdate: 750
+    }]
+});
+
+        // 窗口自适应
+        window.addEventListener('resize', () => {
+            myChart.resize({
+                width: window.innerWidth,
+                height: window.innerHeight
+            });
+        });
+
+        // 确保根节点在展开的节点上下总高度中点
+        myChart.on('click', function(params) {
+            // 检测是否点击的是根节点
+            if (params.seriesName === undefined && params.name === '茶馆') {
+                // 计算并设置根节点的起始位置
+                setTimeout(() => {
+                    myChart.setOption({
+                        series: [{
+                            bottom: '10%',
+                            top: '10%',
+                            left: '10%',
+                            right: '40%'
+                        }]
+                    }, true); // true 表示合并选项
+                }, 100); // 等待动画结束
+            }
+        });
+    </script>
+</body>
+
+</html>

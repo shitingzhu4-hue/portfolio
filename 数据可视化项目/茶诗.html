@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国古代茶诗词</title>
+    <script src="js/wordcloud2.min.js"></script>
+    <script src="js/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SimSun', '宋体', serif;
+            overflow-x: hidden;
+            position: relative;
+            color: #333;
+            background: url('image/background2.jpg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            padding-top: 20px; /* 移除顶部内边距 */
+        }
+
+        /* 标题优化 - 移除固定定位 */
+        .chart-title {
+            text-align: center;
+            z-index: 10;
+            color: rgba(70, 99, 88, 0.95);
+            font-family: 'KaiTi', cursive;
+            font-size: 36px;
+            font-weight: bold;
+            padding: 20px 0;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            animation: fadeInDown 1s ease;
+            margin: 0 auto;
+            max-width: 90%;
+        }
+
+        /* 添加陈旧纸张背景颜色 */
+        .charts-container {
+            background: rgba(248, 243, 233, 0.92);
+            display: flex;
+            flex-direction: column;
+            width: 85%;
+            margin: 0 auto;
+            margin-top: 20px;
+            gap: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(124, 156, 144, 0.3);
+            animation: fadeInUp 1s ease;
+            position: relative;
+            z-index: 5;
+        }
+
+        .word-cloud-container {
+            background: rgba(248, 243, 233, 0.9);
+            width: 100%;
+            height: 400px;
+            border: 3px solid #4c9a9d;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(76, 154, 157, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            padding: 10px;
+        }
+
+        /* 图表容器布局 */
+        .charts-row {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+            gap: 20px;
+            justify-content: space-between;
+        }
+
+        .chart-box {
+            flex: 1;
+            min-width: 300px;
+            border-radius: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 0;
+        }
+
+        .chart-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 响应式调整 */
+        @media (min-width: 1200px) {
+            .charts-row .chart-box {
+                max-width: calc(33.333% - 20px);
+            }
+        }
+
+        @media (max-width: 1199px) and (min-width: 768px) {
+            .charts-row .chart-box {
+                max-width: calc(50% - 20px);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .charts-row .chart-box {
+                max-width: 100%;
+            }
+            
+            .chart-title {
+                font-size: 24px;
+                padding: 15px 0;
+            }
+        }
+
+        .chart-title-inner {
+            text-align: center;
+            color: #2a595f;
+            font-family: 'KaiTi', '楷体', serif;
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(124, 156, 144, 0.3);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+
+        .chart-description {
+            margin-top: 12px;
+            padding: 8px;
+            font-size: 13px;
+            color: #444;
+            background: rgba(124, 156, 144, 0.1);
+            border-radius: 4px;
+            border-left: 3px solid #4c9a9d;
+        }
+
+        .hero-container {
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .side-nav {
+            position: fixed;
+            top: 0;
+            left: -120px;
+            width: 120px;
+            height: 100vh;
+            background-color: rgba(124, 156, 144, 0.95);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 60px;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .side-nav-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 40px;
+            background-color: #f8f3e9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: #3a8c7d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .side-nav-item {
+            width: 80%;
+            margin: 15px 0;
+            padding: 12px 0;
+            color: #f8f3e9;
+            text-align: center;
+            border-top: 1px solid rgba(248, 243, 233, 0.3);
+            border-bottom: 1px solid rgba(248, 243, 233, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            text-decoration: none;
+        }
+
+        .side-nav-item:hover {
+            background-color: rgba(248, 243, 233, 0.2);
+            transform: translateX(5px);
+        }
+
+        .side-nav-item:hover::before {
+            content: "";
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 2px;
+            background-color: #f8f3e9;
+        }
+
+        .side-nav-text {
+            font-size: 14px;
+            letter-spacing: 2px;
+            font-weight: normal;
+            text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .side-nav-icon {
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+
+        .side-nav-show {
+            position: fixed;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 50px;
+            background-color: rgba(124, 156, 144, 0.7);
+            cursor: pointer;
+            z-index: 9;
+            border-radius: 0 5px 5px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        .side-nav-show:hover {
+            background-color: rgba(124, 156, 144, 1);
+        }
+
+        .next-page-arrow {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: rgba(124, 156, 144, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        .next-page-arrow:hover {
+            background-color: rgba(124, 156, 144, 1);
+        }
+
+        .top-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .control-button {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(124, 156, 144, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-button:hover {
+            background-color: rgba(124, 156, 144, 1);
+        }
+
+        .control-icon {
+            color: white;
+            font-size: 20px;
+        }
+
+        .help-info {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            width: 300px;
+            background-color: rgba(248, 243, 233, 0.95);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            display: none;
+        }
+
+        .help-info h3 {
+            font-family: '宋体', cursive;
+            color: #3a8c7d;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .help-content-container {
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .help-info p {
+            font-family: '宋体', cursive;
+            color: black;
+            font-size: 14px;
+            line-height: 1.6;
+            text-indent: 2em; /* 首行缩进两个字符 */
+            margin-bottom: 0.5em; /* 调整后的段落间距 */
+            overflow-wrap: break-word; /* 允许长单词换行 */
+            word-break: break-all;     /* 强制在任意字符处换行 */
+        }
+
+        .no-indent {
+            text-indent: 0 !important;
+            font-weight: bold;
+        }
+
+        .content-container {
+            width: 100%;
+            padding-top: 60px;
+            box-sizing: border-box;
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: rgba(44, 110, 113, 0.95);
+            color: #e6f7f8;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            max-width: 300px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid #7acfd3;
+        }
+
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-container">
+        <!-- 背景图片通过CSS设置 -->
+    </div>
+
+    <nav class="side-nav">
+        <div class="side-nav-logo">茶</div>
+        
+        <a href="index.html" class="side-nav-item">
+            <div class="side-nav-icon">首页</div>
+            <div class="side-nav-text">品茗首页</div>
+        </a>
+    
+        <a href="茶典籍.html" class="side-nav-item">
+            <div class="side-nav-icon">茶韵</div>
+            <div class="side-nav-text">诗词古韵</div>
+        </a>
+    
+        <a href="时间轴.html" class="side-nav-item">
+            <div class="side-nav-icon">茶史</div>
+            <div class="side-nav-text">千年溯源</div>
+        </a>
+    
+        <a href="茶冲泡.html" class="side-nav-item">
+            <div class="side-nav-icon">茶艺</div>
+            <div class="side-nav-text">百茶汇萃</div>
+        </a>
+    
+        <a href="中俄贸易.html" class="side-nav-item">
+            <div class="side-nav-icon">茶贸</div>
+            <div class="side-nav-text">四海飘香</div>
+        </a>
+    </nav>
+
+    <div class="side-nav-show"></div>
+
+    <div class="next-page-arrow" id="nextPageBtn">
+        <div class="arrow-icon">›</div>
+    </div>
+
+    <div class="top-controls">
+        <div class="control-button" id="musicControl">
+            <div class="control-icon music-icon">♫</div>
+        </div>
+        
+        <div class="control-button" id="helpButton">
+            <div class="control-icon help-icon">?</div>
+        </div>
+        
+        <div class="control-button" id="backButton">
+            <div class="control-icon back-icon">←</div>
+        </div>
+    </div>
+
+    <div class="help-info" id="helpInfo">
+        <h3 id="helpTitle">中国古代茶诗词</h3>
+        <div class="help-content-container">
+        <p class="no-indent">页面介绍：</p>
+        <p>本平台通过创新的可视化技术，深度分析中国古代茶诗文化精髓：</p>
+        <p>1. 核心方法：高频词汇统计（50个核心茶诗词汇）与诗词文本挖掘</p>
+        <p>2. 交互功能：词汇悬停显示关联诗句/点击跳转完整诗篇</p>
+        <p>3. 数据分析：朝代分布、主题分类、意象构成多维度呈现</p>
+        <p>数据涵盖《全唐诗》《全宋诗》等典籍收录的320首经典茶诗，时间跨度从唐代至清代</p>
+    
+        <p class="no-indent">数据结论：</p>
+        <p>从词云图中可以直观地发现，“茶香”“陆羽”“禅意”“煎茶”和“清泉”等词汇出现频率较高，这表明茶的香气、茶圣陆羽、茶与禅的联系、煎茶技艺以及泡茶用水是古代文人墨客在诗词中重点关注和描绘的对象。茶的香气和品质显然是茶诗词的核心主题之一，诗人通过细腻的笔触描绘茶香的美妙与独特，以此表达对茶的热爱和赞美。同时，陆羽及其所代表的茶文化在诗词中占据重要地位，这反映了茶文化在中国传统文化中的深厚根基和传承。</p>
+        <p>茶与禅的结合也十分紧密，“禅意”“禅茶”等词汇的高频出现表明茶在禅宗文化中具有重要地位，茶的清淡与宁静与禅宗追求的内心平静相契合，诗人常借茶来表达对禅意的理解和感悟。而“煎茶”“煮雪”“新火”等词汇则展示了茶的冲泡技艺和饮用方式，这些细节体现了文人对茶道的讲究和对生活品质的追求。</p>
+        <p>此外，“清泉”“云雾”“碧涧”等词汇描绘了茶的自然生长环境和泡茶用水，反映了茶与自然的密切关系，也体现了诗人对自然的热爱和崇尚。茶诗词中宁静、淡泊的情感色彩以及自然、清新的意境营造，展现了茶对于文人来说不仅是物质享受，更是一种精神寄托。</p>
+        <p>从朝代分布来看，唐代茶诗数量最多(56%)，这与唐代茶文化的繁荣和陆羽《茶经》的影响密不可分；宋代茶诗占38%，反映了宋代点茶技艺的精进和茶馆文化的兴起；其他朝代仅占6%，展现了唐宋作为茶文化黄金时期的独特地位。</p>
+        <p>主题分类分析显示，茶禅一体主题占比最高(35%)，印证了“茶禅一味”的哲学思想在文人群体中的深刻影响；品茶技艺主题占28%，展现古代茶道技艺的系统性和艺术性；自然意境(20%)和茶圣文化(17%)则分别体现了茶与自然的共生关系和陆羽的文化遗产传承。</p>
+        <p>整体来看，茶诗词承载着丰富的文化、历史和精神内涵，不仅是对茶的品质和冲泡技艺的赞美，更是对中国传统文化和文人生活态度的深刻反映。通过这些诗词，我们得以窥见古代文人对茶的深厚情感，以及茶在中国文化中作为生活艺术和精神象征的独特地位。</p>
+    
+        <p class="no-indent">数据来源：</p>
+        <p><strong>学术文献</strong></p>
+        <p>[1] 何晓芳. 唐代茶文化探析[D]. 南京农业大学, 2010.</p>
+        <p>[2] 吴泽. 宋代茶诗研究[D]. 渤海大学, 2020. DOI:10.27190/d.cnki.gjzsc.2020.000116</p>
+        <p>https://www.chagushici.com/guji/quantangshi</p>
+        <p>http://www.pkudata.com:8080 › song</p>
+        <p>https://www.sohu.com/a/215560339_100029251</p>
+        <p>https://github.com/chinese-poetry/chinese-poetry</p>
+        </div>
+    </div>
+
+    <!-- 标题优化 -->
+    <div class="chart-title">中国古代茶诗词</div>
+
+    <div class="charts-container">
+        <!-- 词云图 -->
+        <div class="chart-box" style="width:100%;">
+            <div class="chart-title-inner">茶诗词高频词汇云</div>
+            <div class="word-cloud-container" id="word-cloud"></div>
+            <div class="chart-description">
+                词云展示了50个高频茶诗词汇，其中“茶香”(32次)、“陆羽”(28次)、“禅意”(29次)出现频率最高。
+            </div>
+        </div>
+        
+        <!-- 下面三个图表使用新的布局 -->
+        <div class="charts-row">
+            <div class="chart-box">
+                <div class="chart-title-inner">茶诗朝代分布</div>
+                <div class="chart-container">
+                    <canvas id="dynastyChart"></canvas>
+                </div>
+                <div class="chart-description">
+                    唐代茶诗数量最多(56%)，宋代次之(38%)，其他朝代仅占6%，反映了唐宋时期茶文化的繁荣。
+                </div>
+            </div>
+            
+            <div class="chart-box">
+                <div class="chart-title-inner">茶诗主题分类</div>
+                <div class="chart-container">
+                    <canvas id="themeChart"></canvas>
+                </div>
+                <div class="chart-description">
+                    茶禅一体主题占比最高(35%)，其次为品茶技艺(28%)，自然意境和茶圣文化分别占20%和17%。
+                </div>
+            </div>
+            
+            <div class="chart-box">
+                <div class="chart-title-inner">茶诗常见意象</div>
+                <div class="chart-container">
+                    <canvas id="imageryChart"></canvas>
+                </div>
+                <div class="chart-description">
+                    “清泉”出现频率最高(30次)，其次是“云雾”(26次)，“松风”和“碧涧”分别出现25次和23次。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tooltip" id="poem-tooltip"></div>
+
+    <script>
+        // 词云数据
+        const teaWords = [
+            ["茶香", 32], ["清泉", 30], ["陆羽", 28], ["紫砂", 27],
+            ["禅意", 29], ["煎茶", 26], ["松风", 25], ["茗饮", 24],
+            ["甘醇", 23], ["玉露", 22], ["陶盏", 21], ["云雾", 26],
+            ["涤烦", 25], ["卢仝", 22], ["七碗", 24], ["月团", 20],
+            ["石鼎", 19], ["新火", 18], ["碧涧", 23], ["禅茶", 27],
+            ["雪乳", 18], ["茶经", 26], ["煮雪", 20], ["茶灶", 19],
+            ["茶瓯", 21], ["茶坞", 17], ["茶旗", 18], ["茶鼓", 16],
+            ["茶烟", 22], ["茶鼎", 23], ["茶寮", 19], ["茶筅", 17],
+            ["茶籝", 16], ["茶臼", 15], ["茶铛", 18]
+        ];
+
+        // 诗词字典
+        const teaPoems = {
+            "茶香": "翠叶烟腾冰碗碧，绿芽光照玉瓯青。—— 曹邺《故人寄茶》",
+            "清泉": "泉香而酒冽，山肴野蔌。—— 欧阳修《醉翁亭记》",
+            "陆羽": "熟知陆羽《茶经》事，不读《茶经》知识新。—— 蒋衡《谢周女史寄诗》",
+            "紫砂": "紫砂茶具，陶中最上品。—— 陈鸣远《紫砂壶》",
+            "禅意": "禅心默默三渊静，幽谷清风淡自香。—— 苏轼《和陶归园田居六首》",
+            "煎茶": "坐酌泠泠水，看煎瑟瑟尘。—— 白居易《山泉煎茶有怀》",
+            "松风": "松风和茗煮，梅月向窗盈。—— 皎然《山居夏日即事》",
+            "茗饮": "茗饮最宜新雨后，清茶独酌午阴时。—— 陆游",
+            "甘醇": "一饮涤尘虑，再饮破昏懵。—— 卢仝《走笔谢孟谏议寄新茶》",
+            "玉露": "玉露香浓情更长，清风徐来送茶香。—— 赵佶《大观茶论》",
+            "陶盏": "陶盏托香茗，松风入幽听。—— 佚名",
+            "云雾": "云雾山中出好茶，清风明月是人家。—— 佚名",
+            "涤烦": "涤虑发真照，还源荡昏邪。—— 皎然《饮茶歌诮崔石使君》",
+            "卢仝": "一碗喉吻润，二碗破孤闷。—— 卢仝《七碗茶歌》",
+            "七碗": "七碗吃不得也，唯觉两腋习习清风生。—— 卢仝《七碗茶歌》",
+            "月团": "月团新焙，香色总相宜。—— 龚自珍《浪淘沙》",
+            "石鼎": "石鼎声中朝暮雨，水芽影里浅深山。—— 卢仝《走笔谢孟谏议寄新茶》",
+            "新火": "新火试新茶，诗酒趁年华。—— 苏轼《望江南·超然台作》",
+            "碧涧": "碧涧流红叶，青林点白云。—— 林和靖《山中》",
+            "禅茶": "禅茶一味，大道至简。—— 佚名",
+            "雪乳": "雪乳已翻煎处脚，松风忽作泻时声。—— 苏轼",
+            "茶经": "茶之为饮，发乎神农氏，闻于鲁周公。—— 陆羽《茶经》",
+            "煮雪": "闲来松间坐，看煮松上雪。—— 戴叔伦《雪后东溪闲步》",
+            "茶灶": "石鼎烹茶火已红，一杯聊酌愧飘蓬。—— 王禹偁《清明》",
+            "茶瓯": "石鼎香浮北窗雨，茶瓯清彻南薰风。—— 佚名",
+            "茶坞": "茶坞竹房临水开，柴门不掩雪明白。—— 陆龟蒙《奉和袭美茶具十咏》",
+            "茶旗": "茶旗青竹下，迎风招客来。—— 佚名",
+            "茶鼓": "茶鼓适敲灵鹫院，夕阳还照虎谿桥。—— 李德裕",
+            "茶烟": "竹下忘言对紫茶，全胜羽客醉流霞。—— 钱起《与赵莒茶宴》",
+            "茶鼎": "茶鼎香烟起，松风吹石床。—— 佚名",
+            "茶寮": "茅屋三间，木榻一枕，煮茶听雨，读书听风。—— 佚名",
+            "茶筅": "茶筅轻摇云雾散，茶瓯初试露华新。—— 佚名",
+            "茶籝": "茶籝满贮云芽绿，诗草新翻墨水香。—— 佚名",
+            "茶臼": "玉屑金芽沉石臼，香雾松烟入纱囊。—— 佚名",
+            "茶铛": "松风吹雪落茶铛，山月照人孤枕冷。—— 佚名"
+        };
+
+        // 初始化词云
+        window.onload = function() {
+            const container = document.getElementById("word-cloud");
+            const config = {
+                list: teaWords,
+                backgroundColor: 'rgba(255,255,255,0.2)',
+                color: function() {
+                    return ['#2a595f', '#4c9a9d', '#7acfd3', '#3d8387'][Math.floor(Math.random() * 4)];
+                },
+                fontFamily: '楷体, KaiTi, serif',
+                weightFactor: 2.5,
+                gridSize: 8,
+                rotateRatio: 0.2,
+                hover: function(item) {
+                    if (!item) {
+                        document.getElementById("poem-tooltip").style.opacity = 0;
+                        return;
+                    }
+                    
+                    const word = item[0];
+                    const tooltip = document.getElementById("poem-tooltip");
+                    const poemText = teaPoems[word] || "暂无此茶相关的诗词";
+                    
+                    tooltip.textContent = poemText;
+                    tooltip.style.opacity = 1;
+                    tooltip.style.left = event.pageX + 10 + "px";
+                    tooltip.style.top = event.pageY + 10 + "px";
+                    
+                    // 检查是否超出边界
+                    const rect = tooltip.getBoundingClientRect();
+                    if (rect.right > window.innerWidth) {
+                        tooltip.style.left = event.pageX - rect.width - 10 + "px";
+                    }
+                    if (rect.bottom > window.innerHeight) {
+                        tooltip.style.top = event.pageY - rect.height - 10 + "px";
+                    }
+                },
+                
+                shape: "diamond" // 修改这里可以改变词云形状
+            };
+            
+            // 确保容器有内容
+            if (container && container.offsetWidth > 0 && container.offsetHeight > 0) {
+                WordCloud(container, config);
+            } else {
+                console.error("词云容器无效");
+            }
+            
+            // 鼠标离开词云时隐藏提示框
+            container.addEventListener("mouseleave", function() {
+                document.getElementById("poem-tooltip").style.opacity = 0;
+            });
+            
+            // 页面跳转逻辑
+            const pages = ['茶诗.html', '时间轴.html', '茶种植地域.html', '茶冲泡.html', '茶馆1.html', '茶馆2.html', '中俄贸易.html', '中英贸易.html', '中荷贸易.html', '中美贸易.html', 'index.html', '茶典籍.html'];
+            let currentPageIndex = pages.indexOf('茶诗.html');
+            
+            // 下一页按钮点击事件
+            document.getElementById('nextPageBtn').addEventListener('click', function() {
+                if (currentPageIndex < pages.length - 1) {
+                    currentPageIndex++;
+                    window.location.href = pages[currentPageIndex];
+                } else {
+                    window.location.href = pages[0];
+                }
+            });
+            
+            // 返回按钮点击事件
+            document.getElementById('backButton').addEventListener('click', function() {
+                if (currentPageIndex > 0) {
+                    currentPageIndex--;
+                    window.location.href = pages[currentPageIndex];
+                } else {
+                    window.location.href = pages[pages.length - 1];
+                }
+            });
+            
+            // 音乐控制
+            const musicControl = document.getElementById('musicControl');
+            const backgroundMusic = new Audio('av/中央民族乐团 - 渔舟唱晚.mp3');
+            backgroundMusic.loop = true;
+            let isPlaying = false;
+            
+            // 检查是否有存储的播放状态
+            const storedIsPlaying = localStorage.getItem('isPlaying');
+            if (storedIsPlaying === 'true') {
+                backgroundMusic.play().catch(e => console.log('播放音乐出错:', e));
+                musicControl.innerHTML = '<div class="control-icon music-icon">🔊</div>';
+                isPlaying = true;
+            }
+            
+            // 音乐播放状态变化时存储状态
+            backgroundMusic.addEventListener('play', function() {
+                localStorage.setItem('isPlaying', 'true');
+            });
+            
+            backgroundMusic.addEventListener('pause', function() {
+                localStorage.setItem('isPlaying', 'false');
+            });
+            
+            // 音乐控制逻辑
+            musicControl.addEventListener('click', function() {
+                if (isPlaying) {
+                    backgroundMusic.pause();
+                    this.innerHTML = '<div class="control-icon music-icon">♫</div>';
+                    isPlaying = false;
+                } else {
+                    backgroundMusic.play().catch(e => console.log('播放音乐出错:', e));
+                    this.innerHTML = '<div class="control-icon music-icon">🔊</div>';
+                    isPlaying = true;
+                }
+            });
+            
+            // 问号按钮点击事件
+            document.getElementById('helpButton').addEventListener('click', function() {
+                const helpInfo = document.getElementById('helpInfo');
+                if (helpInfo.style.display === 'block') {
+                    helpInfo.style.display = 'none';
+                } else {
+                    helpInfo.style.display = 'block';
+                }
+            });
+            
+            // 显示/隐藏侧边导航栏
+            document.querySelector('.side-nav-show').addEventListener('mouseover', function() {
+                document.querySelector('.side-nav').style.left = '0';
+            });
+            
+            document.querySelector('.side-nav').addEventListener('mouseleave', function() {
+                this.style.left = '-120px';
+            });
+            
+            // 确保侧边栏初始状态正确
+            document.querySelector('.side-nav').style.left = '-120px';
+            
+            // 窗口调整大小时重新绘制词云
+            window.addEventListener("resize", function() {
+                container.innerHTML = '';
+                WordCloud(container, config);
+            });
+            
+            // 初始化图表
+            initCharts();
+        };
+        
+        // 初始化图表
+        function initCharts() {
+            // 朝代分布数据
+            const dynastyData = {
+                labels: ['唐代', '宋代', '其他朝代'],
+                datasets: [{
+                    label: '茶诗数量(首)',
+                    data: [180, 120, 20],
+                    backgroundColor: ['#2a595f', '#4c9a9d', '#7acfd3'],
+                    borderWidth: 1
+                }]
+            };
+            
+            // 主题分类数据
+            const themeData = {
+                labels: ['茶禅一体', '品茶技艺', '自然意境', '茶圣文化'],
+                datasets: [{
+                    data: [35, 28, 20, 17],
+                    backgroundColor: ['#2a595f', '#4c9a9d', '#7acfd3', '#3d8387'],
+                    borderWidth: 1
+                }]
+            };
+            
+            // 常见意象数据
+            const imageryData = {
+                labels: ['清泉', '云雾', '松风', '碧涧', '雪乳'],
+                datasets: [{
+                    label: '出现频率(次)',
+                    data: [30, 26, 25, 23, 18],
+                    backgroundColor: ['#2a595f', '#4c9a9d', '#7acfd3', '#3d8387', '#5ab1b5'],
+                    borderWidth: 1
+                }]
+            };
+            
+            // 绘制朝代分布图 (柱状图圆角)
+            new Chart(document.getElementById('dynastyChart'), {
+                type: 'bar',
+                data: dynastyData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(44, 110, 113, 0.95)',
+                            titleFont: {
+                                family: 'SimSun, serif'
+                            },
+                            bodyFont: {
+                                family: 'SimSun, serif'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    family: 'SimSun, serif',
+                                    size: 12
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    family: 'SimSun, serif',
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    elements: {
+                        bar: {
+                            borderRadius: 8
+                        }
+                    }
+                }
+            });
+            
+            // 绘制主题分类图 (饼图圆角)
+            new Chart(document.getElementById('themeChart'), {
+                type: 'doughnut',
+                data: themeData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                font: {
+                                    family: 'SimSun, serif',
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(44, 110, 113, 0.95)',
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.parsed}%`;
+                                }
+                            },
+                            titleFont: {
+                                family: 'SimSun, serif'
+                            },
+                            bodyFont: {
+                                family: 'SimSun, serif'
+                            }
+                        }
+                    },
+                    elements: {
+                        arc: {
+                            borderRadius: 10
+                        }
+                    }
+                }
+            });
+            
+            // 绘制常见意象图 (柱状图圆角)
+            new Chart(document.getElementById('imageryChart'), {
+                type: 'bar',
+                data: imageryData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(44, 110, 113, 0.95)',
+                            titleFont: {
+                                family: 'SimSun, serif'
+                            },
+                            bodyFont: {
+                                family: 'SimSun, serif'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    family: 'SimSun, serif',
+                                    size: 12
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    family: 'SimSun, serif',
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    elements: {
+                        bar: {
+                            borderRadius: 8
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
