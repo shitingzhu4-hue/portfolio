@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中美茶叶贸易</title>
+    <link rel="stylesheet" href="css/jump.css">
+    <link rel="stylesheet" href="css/teaChart.css">
+    <style>
+        body {
+            background: url(image/background2.jpg) center/cover no-repeat fixed;
+            display: flex;
+            flex-direction: column;
+            font-family: 'SimSun', '宋体', serif;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 蓝绿色茶文化主题侧边导航栏 */
+        .side-nav {
+            position: fixed;
+            top: 0;
+            left: -120px;
+            width: 120px;
+            height: 100vh;
+            background-color: rgba(124, 156, 144, 0.95);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 60px;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .side-nav-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 40px;
+            background-color: #f8f3e9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: #3a8c7d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .side-nav-item {
+            width: 80%;
+            margin: 15px 0;
+            padding: 12px 0;
+            color: #f8f3e9;
+            text-align: center;
+            border-top: 1px solid rgba(248, 243, 233, 0.3);
+            border-bottom: 1px solid rgba(248, 243, 233, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            text-decoration: none;
+        }
+
+        .side-nav-item:hover {
+            background-color: rgba(248, 243, 233, 0.2);
+            transform: translateX(5px);
+        }
+
+        .side-nav-item:hover::before {
+            content: "";
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 2px;
+            background-color: #f8f3e9;
+        }
+
+        .side-nav-text {
+            font-size: 14px;
+            letter-spacing: 2px;
+            font-weight: normal;
+            text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .side-nav-icon {
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+
+        .side-nav-show {
+            position: fixed;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 50px;
+            background-color: rgba(124, 156, 144, 0.7);
+            cursor: pointer;
+            z-index: 9;
+            border-radius: 0 5px 5px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        .side-nav-show:hover {
+            background-color: rgba(124, 156, 144, 1);
+        }
+
+        /* 顶部控制按钮 */
+        .top-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .control-button {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(124, 156, 144, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-button:hover {
+            background-color: rgba(124, 156, 144, 1);
+        }
+
+        .control-icon {
+            color: white;
+            font-size: 20px;
+        }
+
+        /* 帮助信息框 */
+        .help-info {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            width: 300px;
+            background-color: rgba(248, 243, 233, 0.95);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            display: none;
+        }
+
+        .help-info h3 {
+            font-family: '宋体', cursive;
+            color: #3a8c7d;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .help-content-container {
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .help-info p {
+            font-family: '宋体', cursive;
+            color: black;
+            font-size: 14px;
+            line-height: 1.6;
+            text-indent: 2em; /* 首行缩进两个字符 */
+            margin-bottom: 0.5em; /* 调整后的段落间距 */;
+            overflow-wrap: break-word; /* 允许长单词换行 */
+            word-break: break-all;     /* 强制在任意字符处换行 */
+        }
+
+        .no-indent {
+            text-indent: 0 !important;
+            font-weight: bold;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .side-nav {
+                width: 80px;
+            }
+            
+            .side-nav-logo {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+                margin-bottom: 30px;
+            }
+            
+            .side-nav-text {
+                display: none;
+            }
+            
+            .side-nav-item {
+                padding: 12px 0;
+            }
+            
+        }
+
+        /* 标题样式 */
+        .tea-culture-title {
+            color: rgba(70, 99, 88, 0.95); 
+            font-family: 'KaiTi', '楷体', serif;
+            font-size: 36px;
+            font-weight: bold;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        /* 下一页箭头 */
+        .next-page-arrow {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: rgba(124, 156, 144, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        /* 信息面板样式保留 */
+        .info-panel {
+            position: fixed;
+            right: -25%;
+            top: 0;
+            width: 25%;
+            height: 100vh;
+            background: rgba(249, 245, 237, 0.95);
+            box-shadow: -2px 0 15px rgba(0,0,0,0.1);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 999;
+            display: flex;
+        }
+
+        .toggle-btn {
+            position: absolute;
+            left: -40px;
+            top: 50%;
+            width: 40px;
+            height: 100px;
+            background: #3D6250 url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>') center/50% no-repeat;
+            cursor: pointer;
+            border-radius: 8px 0 0 8px;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn:hover {
+            background-color: #2F4F3E;
+        }
+
+        .panel-content {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+            color: #4a2c1a;
+        }
+
+        .panel-content h3 {
+            font-family: "KaiTi", serif;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* 展开状态 */
+        .info-panel.active {
+            transform: translateX(-100%);
+        }
+
+        @media (max-width: 768px) {
+            .info-panel {
+                width: 50%;
+                right: -50%;
+            }
+            .toggle-btn {
+                left: -30px;
+                width: 50px;
+                height: 80px;
+            }
+        }
+
+        .teaChart {
+            width: 100%;
+            height: 80vh;
+            min-height: 600px;
+            padding: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 新增侧边导航栏 -->
+    <nav class="side-nav">
+        <div class="side-nav-logo">茶</div>
+        
+        <a href="index.html" class="side-nav-item">
+            <div class="side-nav-icon">首页</div>
+            <div class="side-nav-text">品茗首页</div>
+        </a>
+    
+        <a href="茶典籍.html" class="side-nav-item">
+            <div class="side-nav-icon">茶韵</div>
+            <div class="side-nav-text">诗词古韵</div>
+        </a>
+    
+        <a href="时间轴.html" class="side-nav-item">
+            <div class="side-nav-icon">茶史</div>
+            <div class="side-nav-text">千年溯源</div>
+        </a>
+    
+        <a href="茶冲泡.html" class="side-nav-item">
+            <div class="side-nav-icon">茶艺</div>
+            <div class="side-nav-text">百茶汇萃</div>
+        </a>
+    
+        <a href="中俄贸易.html" class="side-nav-item">
+            <div class="side-nav-icon">茶贸</div>
+            <div class="side-nav-text">四海飘香</div>
+        </a>
+    </nav>
+
+    <!-- 显示/隐藏导航栏的按钮 -->
+    <div class="side-nav-show"></div>
+
+    <!-- 顶部控制按钮 -->
+    <div class="top-controls">
+        <div class="control-button" id="musicControl">
+            <div class="control-icon music-icon">♫</div>
+        </div>
+        
+        <div class="control-button" id="helpButton">
+            <div class="control-icon help-icon">?</div>
+        </div>
+        
+        <div class="control-button" id="backButton">
+            <div class="control-icon back-icon">←</div>
+        </div>
+    </div>
+
+    <!-- 帮助信息框 -->
+    <div class="help-info" id="helpInfo">
+        <h3 id="helpTitle">中美茶叶贸易</h3>
+        <div class="help-content-container">
+            <p class="no-indent">页面介绍：</p>
+            <p>本页通过组合图深入剖析古代中美茶叶贸易格局：</p>
+            <p>1. 饼图呈现：美国茶叶各国家进口量占比，清晰展现中美贸易主导地位</p>
+            <p>2. 折线图绘制：1871 - 1910 年间美国从不同国家进口茶叶的动态变化趋势</p>
+            <p>3. 数据标注：关键年份与节点的详细进口量数值呈现</p>
+            <p>全面复盘近代茶叶贸易的演变历程，揭示中美茶叶贸易的兴衰脉络</p>
+            <p class="no-indent">数据结论：</p>
+            <p>从饼图数据可见，中国古代茶叶在美国进口市场占据压倒性优势，占比高达 57.53%（30800 万斤），远超其他国家。这一数据印证了中国茶叶在近代国际市场的核心地位，自 1784 年中美直接通商后，茶叶贸易逐渐成为中国创汇的重要支柱。日本虽以 37.75%（20210 万斤）位居次位，但与中国的差距依然显著，而印度及斯里兰卡等其他地区合计仅占 1.49%（794.4 万斤），侧面反映出中国茶叶在工艺、口感及文化价值上的独特竞争力。</p>
+            <p>折线图分析显示，19 世纪 70 年代至 20 世纪初，中国茶叶对美出口经历先增后减的复杂过程。早期随着中美贸易通道的拓展与茶文化在美传播，中国茶叶进口量稳步上升，但因受国内战乱、生产标准化滞后及国际竞争加剧等因素影响，后期呈现下滑态势。对比之下，日本在明治维新后大力革新制茶技术，拓展贸易渠道，其对美茶叶出口持续增长并于 19 世纪末实现对中国的赶超，这反映出两国在近代化进程中对传统茶产业的不同发展路径选择。</p>
+            <p>贸易格局的演变还映射出国际政治经济格局的变迁。美国独立初期对华友好的贸易政策助力中国茶叶打开市场，但随着英国通过鸦片贸易扭转贸易逆差，全球贸易体系逐渐重塑，中国茶叶产业也陷入困境。与此同时，日本的崛起以及印度等新兴产区的加入，共同推动了全球茶叶贸易的多元化发展，但中国作为茶叶原产地与文化发源地的独特价值始终难以被完全取代。</p>
+            <p>数据可视化进一步揭示深层规律：中国茶叶进口量在 1880 年前后达到峰值，其后十年间便以年均 15% 左右的速度下滑，而日本在同一时间段的进口量增速维持在 8% - 12%，最终在 1890 年左右实现反超。这一转折点不仅与中国国内茶产业面临的困境有关，也与美国消费者饮茶偏好的转变以及各国茶叶在国际市场上的营销推广策略密切相关。这些发现为理解近代茶叶贸易格局的演变提供了重要参考，也为当今茶叶产业的发展提供了历史借鉴。</p>
+            <p class="no-indent">数据来源：</p>
+            <p>陈慈玉 《近代中国茶业之发展》, 中国人民大学出版社, 2013</p>
+        </div>
+    </div>
+
+    <!-- 下一页箭头 -->
+    <div class="next-page-arrow" id="nextPageBtn">
+        <div class="arrow-icon">›</div>
+    </div>
+
+    <!-- 页面标题 -->
+    <h1 class="tea-culture-title">古代中美茶叶贸易</h1>
+
+    <!-- 图表容器 -->
+    <div class="teaChart"></div>
+
+    <script src="js/echarts.min1.js"></script>
+    <script src="js/teaChart_combo.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // 页面跳转逻辑
+            let currentPageIndex = 0;
+            
+            // 下一页按钮点击事件
+            document.getElementById('nextPageBtn').addEventListener('click', function() {
+                // 获取当前页面的索引
+                const pages = ['中美贸易.html', 'index.html', '茶典籍.html', '茶诗.html', '时间轴.html', '茶种植地域.html', '茶冲泡.html', '茶馆1.html', '茶馆2.html', '中俄贸易.html', '中英贸易.html', '中荷贸易.html'];
+                const currentPage = window.location.pathname.split('/').pop();
+                currentPageIndex = pages.indexOf(currentPage) !== -1 ? pages.indexOf(currentPage) : 0;
+                
+                if (currentPageIndex < pages.length - 1) {
+                    currentPageIndex++;
+                    window.location.href = pages[currentPageIndex];
+                } else {
+                    window.location.href = pages[0];
+                }
+            });
+            
+            // 返回按钮点击事件
+            document.getElementById('backButton').addEventListener('click', function() {
+                // 获取当前页面的索引
+                const pages = ['中美贸易.html', 'index.html', '茶典籍.html', '茶诗.html', '时间轴.html', '茶种植地域.html', '茶冲泡.html', '茶馆1.html', '茶馆2.html', '中俄贸易.html', '中英贸易.html', '中荷贸易.html'];
+                const currentPage = window.location.pathname.split('/').pop();
+                currentPageIndex = pages.indexOf(currentPage) !== -1 ? pages.indexOf(currentPage) : 0;
+                
+                if (currentPageIndex > 0) {
+                    currentPageIndex--;
+                    window.location.href = pages[currentPageIndex];
+                } else {
+                    window.location.href = pages[pages.length - 1];
+                }
+            });
+            
+            // 音乐控制
+            const musicControl = document.getElementById('musicControl');
+            const backgroundMusic = new Audio('av/中央民族乐团 - 渔舟唱晚.mp3');
+            backgroundMusic.loop = true;
+            let isPlaying = false;
+            
+            // 检查是否有存储的播放状态
+            const storedIsPlaying = localStorage.getItem('isPlaying');
+            if (storedIsPlaying === 'true') {
+                backgroundMusic.play().catch(e => console.log('播放音乐出错:', e));
+                musicControl.innerHTML = '<div class="control-icon music-icon">🔊</div>';
+                isPlaying = true;
+            }
+            
+            // 音乐播放状态变化时存储状态
+            backgroundMusic.addEventListener('play', function() {
+                localStorage.setItem('isPlaying', 'true');
+            });
+            
+            backgroundMusic.addEventListener('pause', function() {
+                localStorage.setItem('isPlaying', 'false');
+            });
+            
+            // 音乐控制逻辑
+            musicControl.addEventListener('click', function() {
+                if (isPlaying) {
+                    backgroundMusic.pause();
+                    this.innerHTML = '<div class="control-icon music-icon">♫</div>';
+                    isPlaying = false;
+                } else {
+                    backgroundMusic.play().catch(e => console.log('播放音乐出错:', e));
+                    this.innerHTML = '<div class="control-icon music-icon">🔊</div>';
+                    isPlaying = true;
+                }
+            });
+            
+            // 问号按钮点击事件
+            document.getElementById('helpButton').addEventListener('click', function() {
+                const helpInfo = document.getElementById('helpInfo');
+                if (helpInfo.style.display === 'block') {
+                    helpInfo.style.display = 'none';
+                } else {
+                    helpInfo.style.display = 'block';
+                }
+            });
+            
+            // 显示/隐藏侧边导航栏
+            document.querySelector('.side-nav-show').addEventListener('mouseover', function() {
+                document.querySelector('.side-nav').style.left = '0';
+            });
+            
+            document.querySelector('.side-nav').addEventListener('mouseleave', function() {
+                this.style.left = '-120px';
+            });
+            
+            // 确保侧边栏初始状态正确
+            document.querySelector('.side-nav').style.left = '-120px';
+            
+            // 页面卸载时保存音乐播放状态
+            window.addEventListener('beforeunload', function() {
+                localStorage.setItem('isPlaying', isPlaying ? 'true' : 'false');
+            });
+
+            // 信息面板交互逻辑
+            const infoPanel = document.querySelector('.info-panel');
+            const toggleBtn = document.querySelector('.toggle-btn');
+
+            toggleBtn.addEventListener('click', () => {
+                infoPanel.classList.toggle('active');
+                
+                // 切换箭头方向
+                const isActive = infoPanel.classList.contains('active');
+                toggleBtn.style.backgroundImage = `url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="${isActive ? 'M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z' : 'M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z'}"/></svg>')`;
+            });
+        });
+    </script>
+</body>
+</html>
